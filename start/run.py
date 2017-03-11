@@ -3,6 +3,7 @@
 import requests
 
 from start.download_model import Download
+from start.html_parser_model import HtmlParser
 
 
 def get_photo_url(pn=1, rn=60):
@@ -34,8 +35,16 @@ def get_photo_url(pn=1, rn=60):
 if __name__ == "__main__":
     Download.init()
     download = Download.get_instance()
-    n = 1
-    for index in range(n, n + 6):
-        for url in get_photo_url(index * 60):
-            download.download(url)
-            print url
+
+    url = "http://www.tooopen.com/img/87.aspx"
+
+    html_parser = HtmlParser(100)
+    html_parser.start(url)
+
+    url_list = html_parser.get_img_set()
+    print len(url_list)
+    print "开始下载图片"
+
+    download.use_proxy(True)
+    download.download(url_list)
+    print "下载图片结束"
