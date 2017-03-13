@@ -14,6 +14,9 @@ class UrlManagerBase(object):
     def is_empty(self):
         pass
 
+    def is_full(self):
+        pass
+
 
 class HTMLParserBase(object):
     def parser(self, html):

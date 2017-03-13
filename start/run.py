@@ -36,15 +36,23 @@ if __name__ == "__main__":
     Download.init()
     download = Download.get_instance()
 
-    url = "http://www.tooopen.com/img/87.aspx"
+    url = "http://www.99mm.me"
+    url = "http://www.99mm.me/xinggan/2392.html"
+
+
+    proxy = False
+    timeout = 5
 
     html_parser = HtmlParser(100)
-    html_parser.start(url)
+    html_parser.use_proxy(proxy)
+    html_parser.timeout(timeout)
+    html_parser.parse(url)
 
     url_list = html_parser.get_img_set()
     print len(url_list)
     print "开始下载图片"
 
-    download.use_proxy(True)
+    download.use_proxy(proxy)
+    download.timeout(timeout)
     download.download(url_list)
     print "下载图片结束"

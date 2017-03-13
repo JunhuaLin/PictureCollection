@@ -1,21 +1,22 @@
 # encoding = utf-8
 import os
+import platform
 import urlparse
 
 import requests
 
 
 class Download(object):
-    root_dir = "D:\\images"
     this_download = None
-    chunk_size = 1024
-    proxies = {"http": "http://127.0.0.1:1080", "https": "http://127.0.0.1:1080"}
-    is_use_proxies = False
-    timeout = 10
 
     def __init__(self):
-        if not os.path.exists(Download.root_dir):
-            os.mkdir(Download.root_dir)
+        self.root_dir = "D:\\images" if platform.system() == 'Windows' else "/home/junhua/Pictures/"
+        self.chunk_size = 1024
+        self.proxies = {"http": "http://127.0.0.1:1080", "https": "http://127.0.0.1:1080"}
+        self.is_use_proxies = False
+        self.request_timeout = 2
+        if not os.path.exists(self.root_dir):
+            os.mkdir(self.root_dir)
 
     @staticmethod
     def init(root=""):
@@ -36,19 +37,20 @@ class Download(object):
         if url is None:
             return
 
+        if isinstance(url, str):
+            url = [url]
+
         proxies = self.proxies
         if not self.is_use_proxies:
             proxies = None
 
-        if isinstance(url, str):
-            r = requests.get(url, proxies=proxies, timeout=self.timeout)
-            self._download_single(r, url)
-            return
-
-        if isinstance(url, set) or isinstance(url, list):
-            for u in url:
-                r = requests.get(u, proxies=proxies, timeout=self.timeout)
-                self._download_single(r, u)
+        try:
+            if isinstance(url, set) or isinstance(url, list):
+                for u in url:
+                    r = requests.get(u, proxies=proxies, timeout=self.request_timeout)
+                    self._download_single(r, u)
+        except:
+            pass
 
     def _download_single(self, r, url):
         url_str_parse = urlparse.urlparse(url)
@@ -57,7 +59,7 @@ class Download(object):
         with open(file_path, 'wb') as fd:
             for chunk in r.iter_content(self.chunk_size):
                 fd.write(chunk)
-        print url
+        print "download--> ", url
 
     def set_proxies(self, proxies):
         if isinstance(proxies, dict):
@@ -68,3 +70,6 @@ class Download(object):
             self.is_use_proxies = True
         else:
             self.is_use_proxies = False
+
+    def timeout(self, time=2):
+        self.request_timeout = time
